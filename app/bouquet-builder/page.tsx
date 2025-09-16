@@ -14,6 +14,7 @@ import {
   Star,
   RotateCcw,
   Download,
+  Package,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -34,8 +35,23 @@ interface Flower {
   season: string
 }
 
+interface AdditionalItem {
+  id: string
+  name: string
+  price: number
+  unit: string
+  category: string
+  availability: number
+  image: string
+}
+
 interface BouquetItem {
   flower: Flower
+  quantity: number
+}
+
+interface BouquetAdditionalItem {
+  item: AdditionalItem
   quantity: number
 }
 
@@ -110,6 +126,81 @@ const flowers: Flower[] = [
   },
 ]
 
+const additionalItems: AdditionalItem[] = [
+  {
+    id: "ribbon-satin-red",
+    name: "Атласная лента красная",
+    price: 45,
+    unit: "м",
+    category: "Ленты",
+    availability: 50,
+    image: "/red-satin-ribbon.jpg",
+  },
+  {
+    id: "ribbon-satin-white",
+    name: "Атласная лента белая",
+    price: 40,
+    unit: "м",
+    category: "Ленты",
+    availability: 60,
+    image: "/white-satin-ribbon.jpg",
+  },
+  {
+    id: "paper-kraft",
+    name: "Крафт-бумага",
+    price: 25,
+    unit: "м²",
+    category: "Упаковка",
+    availability: 30,
+    image: "/kraft-paper-roll.jpg",
+  },
+  {
+    id: "paper-tissue-pink",
+    name: "Тишью розовая",
+    price: 15,
+    unit: "м²",
+    category: "Упаковка",
+    availability: 40,
+    image: "/pink-tissue-paper.jpg",
+  },
+  {
+    id: "greenery-eucalyptus",
+    name: "Эвкалипт",
+    price: 120,
+    unit: "пучок",
+    category: "Зелень",
+    availability: 25,
+    image: "/eucalyptus-bunch.jpg",
+  },
+  {
+    id: "greenery-fern",
+    name: "Папоротник",
+    price: 80,
+    unit: "пучок",
+    category: "Зелень",
+    availability: 20,
+    image: "/fern-bunch.jpg",
+  },
+  {
+    id: "wire-floral",
+    name: "Флористическая проволока",
+    price: 5,
+    unit: "шт",
+    category: "Материалы",
+    availability: 100,
+    image: "/floral-wire.jpg",
+  },
+  {
+    id: "foam-oasis",
+    name: "Флористическая губка",
+    price: 35,
+    unit: "шт",
+    category: "Материалы",
+    availability: 50,
+    image: "/floral-foam-oasis.jpg",
+  },
+]
+
 const templates: Template[] = [
   {
     id: "romantic",
@@ -136,13 +227,15 @@ const templates: Template[] = [
 
 export default function BouquetBuilderPage() {
   const [selectedFlowers, setSelectedFlowers] = useState<BouquetItem[]>([])
+  const [selectedAdditionalItems, setSelectedAdditionalItems] = useState<BouquetAdditionalItem[]>([])
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null)
   const [bouquetName, setBouquetName] = useState("")
   const [markup, setMarkup] = useState([50])
   const [activeTab, setActiveTab] = useState("builder")
 
   const totalCost = selectedFlowers.reduce((sum, item) => sum + item.flower.price * item.quantity, 0)
-  const finalPrice = totalCost * (1 + markup[0] / 100)
+  const additionalCost = selectedAdditionalItems.reduce((sum, item) => sum + item.item.price * item.quantity, 0)
+  const finalPrice = (totalCost + additionalCost) * (1 + markup[0] / 100)
 
   const addFlower = (flower: Flower) => {
     const existingItem = selectedFlowers.find((item) => item.flower.id === flower.id)
@@ -165,6 +258,31 @@ export default function BouquetBuilderPage() {
     )
   }
 
+  const addAdditionalItem = (item: AdditionalItem) => {
+    const existingItem = selectedAdditionalItems.find((selected) => selected.item.id === item.id)
+    if (existingItem) {
+      setSelectedAdditionalItems((prev) =>
+        prev.map((selected) =>
+          selected.item.id === item.id
+            ? { ...selected, quantity: Math.min(selected.quantity + 1, item.availability) }
+            : selected,
+        ),
+      )
+    } else {
+      setSelectedAdditionalItems((prev) => [...prev, { item, quantity: 1 }])
+    }
+  }
+
+  const removeAdditionalItem = (itemId: string) => {
+    setSelectedAdditionalItems((prev) =>
+      prev
+        .map((selected) =>
+          selected.item.id === itemId ? { ...selected, quantity: Math.max(selected.quantity - 1, 0) } : selected,
+        )
+        .filter((selected) => selected.quantity > 0),
+    )
+  }
+
   const loadTemplate = (template: Template) => {
     setSelectedFlowers(template.items)
     setSelectedTemplate(template)
@@ -173,6 +291,7 @@ export default function BouquetBuilderPage() {
 
   const clearBouquet = () => {
     setSelectedFlowers([])
+    setSelectedAdditionalItems([])
     setSelectedTemplate(null)
     setBouquetName("")
   }
@@ -199,6 +318,17 @@ export default function BouquetBuilderPage() {
   }
 
   const compatibilityScore = getCompatibilityScore()
+
+  const groupedAdditionalItems = additionalItems.reduce(
+    (acc, item) => {
+      if (!acc[item.category]) {
+        acc[item.category] = []
+      }
+      acc[item.category].push(item)
+      return acc
+    },
+    {} as Record<string, AdditionalItem[]>,
+  )
 
   return (
     <div className="min-h-screen bg-background">
@@ -240,7 +370,7 @@ export default function BouquetBuilderPage() {
           <TabsContent value="builder" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Flower Selection */}
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-2 space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -279,6 +409,60 @@ export default function BouquetBuilderPage() {
                     </div>
                   </CardContent>
                 </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Package className="h-5 w-5" />
+                      Дополнительные материалы
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Tabs defaultValue="Ленты" className="space-y-4">
+                      <TabsList className="grid w-full grid-cols-4">
+                        {Object.keys(groupedAdditionalItems).map((category) => (
+                          <TabsTrigger key={category} value={category} className="text-xs">
+                            {category}
+                          </TabsTrigger>
+                        ))}
+                      </TabsList>
+
+                      {Object.entries(groupedAdditionalItems).map(([category, items]) => (
+                        <TabsContent key={category} value={category}>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {items.map((item) => (
+                              <div key={item.id} className="border rounded-lg p-4 hover:bg-accent/50 transition-colors">
+                                <div className="flex items-center gap-3">
+                                  <img
+                                    src={item.image || "/placeholder.svg"}
+                                    alt={item.name}
+                                    className="w-12 h-12 rounded-lg object-cover"
+                                  />
+                                  <div className="flex-1">
+                                    <h3 className="font-medium text-sm">{item.name}</h3>
+                                    <p className="text-xs text-muted-foreground">
+                                      {item.price}₽ за {item.unit}
+                                    </p>
+                                    <Badge variant="outline" className="text-xs mt-1">
+                                      {item.availability} {item.unit}
+                                    </Badge>
+                                  </div>
+                                  <Button
+                                    size="sm"
+                                    onClick={() => addAdditionalItem(item)}
+                                    disabled={item.availability === 0}
+                                  >
+                                    <Plus className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </TabsContent>
+                      ))}
+                    </Tabs>
+                  </CardContent>
+                </Card>
               </div>
 
               {/* Bouquet Composition */}
@@ -301,10 +485,10 @@ export default function BouquetBuilderPage() {
                       />
                     </div>
 
-                    {selectedFlowers.length === 0 ? (
-                      <p className="text-muted-foreground text-center py-8">Выберите цветы для букета</p>
-                    ) : (
+                    {/* Flowers Section */}
+                    {selectedFlowers.length > 0 && (
                       <div className="space-y-3">
+                        <h4 className="font-medium text-sm">Цветы:</h4>
                         {selectedFlowers.map((item) => (
                           <div key={item.flower.id} className="flex items-center justify-between p-3 border rounded-lg">
                             <div className="flex items-center gap-2">
@@ -339,6 +523,50 @@ export default function BouquetBuilderPage() {
                       </div>
                     )}
 
+                    {selectedAdditionalItems.length > 0 && (
+                      <div className="space-y-3">
+                        <h4 className="font-medium text-sm">Материалы:</h4>
+                        {selectedAdditionalItems.map((item) => (
+                          <div
+                            key={item.item.id}
+                            className="flex items-center justify-between p-3 border rounded-lg bg-accent/20"
+                          >
+                            <div className="flex items-center gap-2">
+                              <img
+                                src={item.item.image || "/placeholder.svg"}
+                                alt={item.item.name}
+                                className="w-8 h-8 rounded object-cover"
+                              />
+                              <div>
+                                <p className="font-medium text-sm">{item.item.name}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {item.item.price}₽ × {item.quantity} {item.item.unit}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Button size="sm" variant="outline" onClick={() => removeAdditionalItem(item.item.id)}>
+                                <Minus className="h-3 w-3" />
+                              </Button>
+                              <span className="mx-2 text-sm font-medium">{item.quantity}</span>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => addAdditionalItem(item.item)}
+                                disabled={item.quantity >= item.item.availability}
+                              >
+                                <Plus className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {selectedFlowers.length === 0 && selectedAdditionalItems.length === 0 && (
+                      <p className="text-muted-foreground text-center py-8">Выберите цветы и материалы для букета</p>
+                    )}
+
                     {/* Compatibility Score */}
                     {selectedFlowers.length > 1 && (
                       <div className="p-3 border rounded-lg">
@@ -360,16 +588,24 @@ export default function BouquetBuilderPage() {
                     )}
 
                     {/* Price Summary */}
-                    {selectedFlowers.length > 0 && (
+                    {(selectedFlowers.length > 0 || selectedAdditionalItems.length > 0) && (
                       <div className="p-3 border rounded-lg bg-accent/20">
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
-                            <span>Себестоимость:</span>
+                            <span>Цветы:</span>
                             <span>{totalCost}₽</span>
                           </div>
                           <div className="flex justify-between">
+                            <span>Материалы:</span>
+                            <span>{additionalCost}₽</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Себестоимость:</span>
+                            <span>{totalCost + additionalCost}₽</span>
+                          </div>
+                          <div className="flex justify-between">
                             <span>Наценка ({markup[0]}%):</span>
-                            <span>{Math.round(finalPrice - totalCost)}₽</span>
+                            <span>{Math.round(finalPrice - (totalCost + additionalCost))}₽</span>
                           </div>
                           <div className="flex justify-between font-bold border-t pt-2">
                             <span>Итого:</span>
@@ -379,7 +615,10 @@ export default function BouquetBuilderPage() {
                       </div>
                     )}
 
-                    <Button className="w-full" disabled={selectedFlowers.length === 0}>
+                    <Button
+                      className="w-full"
+                      disabled={selectedFlowers.length === 0 && selectedAdditionalItems.length === 0}
+                    >
                       <Save className="h-4 w-4 mr-2" />
                       Сохранить букет
                     </Button>
@@ -441,7 +680,7 @@ export default function BouquetBuilderPage() {
               </CardHeader>
               <CardContent>
                 <div className="aspect-square bg-gradient-to-br from-green-50 to-pink-50 rounded-lg flex items-center justify-center border-2 border-dashed border-border">
-                  {selectedFlowers.length > 0 ? (
+                  {selectedFlowers.length > 0 || selectedAdditionalItems.length > 0 ? (
                     <div className="text-center space-y-4">
                       <div className="relative">
                         <div className="w-48 h-48 mx-auto bg-gradient-to-t from-green-200 to-transparent rounded-full flex items-end justify-center">
@@ -470,6 +709,9 @@ export default function BouquetBuilderPage() {
                         <h3 className="font-bold text-lg">{bouquetName || "Новый букет"}</h3>
                         <p className="text-muted-foreground">
                           {selectedFlowers.reduce((sum, item) => sum + item.quantity, 0)} цветов
+                          {selectedAdditionalItems.length > 0 && (
+                            <span> + {selectedAdditionalItems.length} материалов</span>
+                          )}
                         </p>
                         <p className="font-bold text-xl">{Math.round(finalPrice)}₽</p>
                       </div>
@@ -502,25 +744,35 @@ export default function BouquetBuilderPage() {
 
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span>Себестоимость материалов:</span>
+                      <span>Себестоимость цветов:</span>
                       <span>{totalCost}₽</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span>Работа флориста (20%):</span>
-                      <span>{Math.round(totalCost * 0.2)}₽</span>
+                      <span>Стоимость материалов:</span>
+                      <span>{additionalCost}₽</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span>Упаковка и декор:</span>
-                      <span>150₽</span>
+                      <span>Работа флориста (20%):</span>
+                      <span>{Math.round((totalCost + additionalCost) * 0.2)}₽</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>Наценка ({markup[0]}%):</span>
-                      <span>{Math.round(((totalCost + totalCost * 0.2 + 150) * markup[0]) / 100)}₽</span>
+                      <span>
+                        {Math.round(
+                          ((totalCost + additionalCost + (totalCost + additionalCost) * 0.2) * markup[0]) / 100,
+                        )}
+                        ₽
+                      </span>
                     </div>
                     <div className="border-t pt-2">
                       <div className="flex justify-between font-bold">
                         <span>Итоговая цена:</span>
-                        <span>{Math.round((totalCost + totalCost * 0.2 + 150) * (1 + markup[0] / 100))}₽</span>
+                        <span>
+                          {Math.round(
+                            (totalCost + additionalCost + (totalCost + additionalCost) * 0.2) * (1 + markup[0] / 100),
+                          )}
+                          ₽
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -535,12 +787,14 @@ export default function BouquetBuilderPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center p-3 border rounded-lg">
                       <p className="text-2xl font-bold text-green-600">
-                        {Math.round(((finalPrice - totalCost) / finalPrice) * 100)}%
+                        {Math.round(((finalPrice - (totalCost + additionalCost)) / finalPrice) * 100)}%
                       </p>
                       <p className="text-sm text-muted-foreground">Маржа</p>
                     </div>
                     <div className="text-center p-3 border rounded-lg">
-                      <p className="text-2xl font-bold text-blue-600">{Math.round(finalPrice - totalCost)}₽</p>
+                      <p className="text-2xl font-bold text-blue-600">
+                        {Math.round(finalPrice - (totalCost + additionalCost))}₽
+                      </p>
                       <p className="text-sm text-muted-foreground">Прибыль</p>
                     </div>
                   </div>
@@ -548,11 +802,11 @@ export default function BouquetBuilderPage() {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>Конкурентная цена:</span>
-                      <span className="text-orange-600">от {Math.round(totalCost * 1.3)}₽</span>
+                      <span className="text-orange-600">от {Math.round((totalCost + additionalCost) * 1.3)}₽</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>Премиум сегмент:</span>
-                      <span className="text-purple-600">от {Math.round(totalCost * 2)}₽</span>
+                      <span className="text-purple-600">от {Math.round((totalCost + additionalCost) * 2)}₽</span>
                     </div>
                   </div>
 
