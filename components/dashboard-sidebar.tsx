@@ -18,6 +18,7 @@ import {
   Receipt,
   Flower,
   Calendar,
+  Leaf,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -25,12 +26,13 @@ import { cn } from "@/lib/utils"
 const navigation = [
   { name: "Главная", href: "/", icon: Home },
   { name: "Товары", href: "/inventory", icon: Package },
+  { name: "Флористический склад", href: "/floristic-inventory", icon: Leaf },
   { name: "Заказы", href: "/orders", icon: ShoppingCart },
   { name: "Сотрудники", href: "/employees", icon: Users },
   { name: "Финансы", href: "/finance", icon: DollarSign },
   { name: "Скидки", href: "/discounts", icon: Percent },
   { name: "Конструктор букетов", href: "/bouquet-builder", icon: Flower },
-  { name: "Календарь свежести", href: "/freshness", icon: Calendar }, // добавил ссылку на календарь свежести
+  { name: "Календарь свежести", href: "/freshness", icon: Calendar },
   { name: "Веб-сайт", href: "#", icon: Globe },
   { name: "Касса", href: "/pos", icon: Receipt },
   { name: "Аналитика", href: "/analytics", icon: BarChart3 },
