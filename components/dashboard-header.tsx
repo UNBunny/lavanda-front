@@ -5,19 +5,12 @@ import { useRouter } from "next/navigation"
 import { Bell, Search, Settings, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 export function DashboardHeader() {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [showProfileMenu, setShowProfileMenu] = useState(false)
   const router = useRouter()
 
   const handleNotifications = () => {
@@ -28,13 +21,18 @@ export function DashboardHeader() {
     setIsSettingsOpen(true)
   }
 
+  const toggleProfileMenu = () => {
+    setShowProfileMenu(!showProfileMenu)
+  }
+
   const handleLogout = () => {
     localStorage.removeItem("isAuthenticated")
     localStorage.removeItem("userEmail")
     router.push("/login")
   }
 
-  const userEmail = typeof window !== "undefined" ? localStorage.getItem("userEmail") : null
+  // Простое получение email пользователя
+  const userEmail = "admin@lavanda.com"
 
   return (
     <>
@@ -58,24 +56,47 @@ export function DashboardHeader() {
               <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
-                  <User className="h-4 w-4 sm:h-5 sm:w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>{userEmail ? userEmail : "Мой аккаунт"}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Профиль</DropdownMenuItem>
-                <DropdownMenuItem onClick={handleSettings}>Настройки</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Выйти
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Простое выпадающее меню без использования компонентов Radix UI */}
+            <div className="relative">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={toggleProfileMenu} 
+                className="h-8 w-8 sm:h-10 sm:w-10"
+              >
+                <User className="h-4 w-4 sm:h-5 sm:w-5" />
+              </Button>
+              
+              {showProfileMenu && (
+                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 shadow-lg rounded-md border border-gray-200 dark:border-gray-700 z-50">
+                  <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+                    <p className="text-sm font-medium">{userEmail}</p>
+                  </div>
+                  <div className="py-1">
+                    <button 
+                      className="flex w-full items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      Профиль
+                    </button>
+                    <button 
+                      className="flex w-full items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                      onClick={handleSettings}
+                    >
+                      Настройки
+                    </button>
+                  </div>
+                  <div className="py-1 border-t border-gray-200 dark:border-gray-700">
+                    <button 
+                      className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Выйти
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
