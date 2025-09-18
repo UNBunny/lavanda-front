@@ -7,10 +7,14 @@ import { Suspense } from "react"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "ERP Система",
+  title: "LAVANDA ERP",
   description: "Система управления предприятием",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1",
-    generator: 'v0.app'
+  generator: 'v0.app',
+  icons: {
+    icon: '/logo-icon.svg',
+    apple: '/logo-icon.svg',
+  }
 }
 
 export default function RootLayout({
