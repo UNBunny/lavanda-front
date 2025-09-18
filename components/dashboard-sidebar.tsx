@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
@@ -21,6 +21,7 @@ import {
   Leaf,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
 
 const navigation = [
@@ -39,14 +40,101 @@ const navigation = [
   { name: "Настройки", href: "/settings", icon: Settings },
 ]
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkIsMobile()
+    window.addEventListener("resize", checkIsMobile)
+
+    return () => window.removeEventListener("resize", checkIsMobile)
+  }, [])
+
+  return isMobile
+}
+
+function NavigationItems({ onItemClick }: { onItemClick?: () => void }) {
+  const pathname = usePathname()
+
+  return (
+    <>
+      {navigation.map((item) => {
+        const isActive = pathname === item.href
+        const content = (
+          <Button
+            variant={isActive ? "secondary" : "ghost"}
+            className="w-full justify-start gap-3"
+            onClick={onItemClick}
+          >
+            <item.icon className="h-5 w-5 flex-shrink-0" />
+            <span>{item.name}</span>
+          </Button>
+        )
+
+        if (item.href === "#") {
+          return <div key={item.name}>{content}</div>
+        }
+
+        return (
+          <Link key={item.name} href={item.href}>
+            {content}
+          </Link>
+        )
+      })}
+    </>
+  )
+}
+
 export function DashboardSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
+  const isMobile = useIsMobile()
   const pathname = usePathname()
+
+  useEffect(() => {
+    setIsSheetOpen(false)
+  }, [pathname])
+
+  if (isMobile) {
+    return (
+      <>
+        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="fixed top-4 left-4 z-50 md:hidden bg-background border shadow-sm"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-64 p-0">
+            <div className="flex h-16 items-center px-4 border-b border-sidebar-border">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                  <BarChart3 className="h-5 w-5 text-primary-foreground" />
+                </div>
+                <span className="font-bold text-lg">ERP System</span>
+              </div>
+            </div>
+            <nav className="p-4 space-y-2">
+              <NavigationItems onItemClick={() => setIsSheetOpen(false)} />
+            </nav>
+          </SheetContent>
+        </Sheet>
+        <div className="w-0" />
+      </>
+    )
+  }
 
   return (
     <div
       className={cn(
-        "bg-sidebar border-r border-sidebar-border transition-all duration-300",
+        "bg-sidebar border-r border-sidebar-border transition-all duration-300 hidden md:block",
         isCollapsed ? "w-16" : "w-64",
       )}
     >

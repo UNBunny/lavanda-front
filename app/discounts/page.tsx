@@ -225,63 +225,67 @@ export default function DiscountsPage() {
               <CardDescription>Управляйте всеми скидками и промокодами</CardDescription>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Название</TableHead>
-                    <TableHead>Промокод</TableHead>
-                    <TableHead>Тип</TableHead>
-                    <TableHead>Размер</TableHead>
-                    <TableHead>Период</TableHead>
-                    <TableHead>Использовано</TableHead>
-                    <TableHead>Статус</TableHead>
-                    <TableHead>Действия</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {discounts.map((discount) => (
-                    <TableRow key={discount.id}>
-                      <TableCell className="font-medium">{discount.name}</TableCell>
-                      <TableCell>
-                        <code className="bg-muted px-2 py-1 rounded text-sm">{discount.code}</code>
-                      </TableCell>
-                      <TableCell>{discount.type === "percentage" ? "Процентная" : "Фиксированная"}</TableCell>
-                      <TableCell>
-                        {discount.type === "percentage" ? `${discount.value}%` : `₽${discount.value}`}
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-sm">
-                          <div>{new Date(discount.startDate).toLocaleDateString("ru-RU")}</div>
-                          <div className="text-muted-foreground">
-                            {new Date(discount.endDate).toLocaleDateString("ru-RU")}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-sm">
-                          <div>{discount.usageCount}</div>
-                          {discount.usageLimit && <div className="text-muted-foreground">из {discount.usageLimit}</div>}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={discount.status === "active" ? "default" : "secondary"}>
-                          {discount.status === "active" ? "Активна" : "Приостановлена"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button variant="ghost" size="icon">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="min-w-[150px]">Название</TableHead>
+                      <TableHead className="min-w-[120px]">Промокод</TableHead>
+                      <TableHead className="min-w-[100px]">Тип</TableHead>
+                      <TableHead className="min-w-[80px]">Размер</TableHead>
+                      <TableHead className="min-w-[120px]">Период</TableHead>
+                      <TableHead className="min-w-[100px]">Использовано</TableHead>
+                      <TableHead className="min-w-[80px]">Статус</TableHead>
+                      <TableHead className="min-w-[120px]">Действия</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {discounts.map((discount) => (
+                      <TableRow key={discount.id}>
+                        <TableCell className="font-medium">{discount.name}</TableCell>
+                        <TableCell>
+                          <code className="bg-muted px-2 py-1 rounded text-sm">{discount.code}</code>
+                        </TableCell>
+                        <TableCell>{discount.type === "percentage" ? "Процентная" : "Фиксированная"}</TableCell>
+                        <TableCell>
+                          {discount.type === "percentage" ? `${discount.value}%` : `₽${discount.value}`}
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm">
+                            <div>{new Date(discount.startDate).toLocaleDateString("ru-RU")}</div>
+                            <div className="text-muted-foreground">
+                              {new Date(discount.endDate).toLocaleDateString("ru-RU")}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm">
+                            <div>{discount.usageCount}</div>
+                            {discount.usageLimit && (
+                              <div className="text-muted-foreground">из {discount.usageLimit}</div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={discount.status === "active" ? "default" : "secondary"}>
+                            {discount.status === "active" ? "Активна" : "Приостановлена"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button variant="ghost" size="icon">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

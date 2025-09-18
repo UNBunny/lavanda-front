@@ -226,7 +226,7 @@ export default function FloristicInventoryPage() {
                 <Button variant="outline">Экспорт</Button>
                 <Button className="bg-primary hover:bg-primary/90" onClick={() => setIsAddProductOpen(true)}>
                   <Plus className="w-4 h-4 mr-2" />
-                  Добавить товар
+                  Добавить позицию
                 </Button>
               </div>
             </div>
@@ -379,7 +379,7 @@ export default function FloristicInventoryPage() {
       <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Добавить флористический товар</DialogTitle>
+            <DialogTitle>Добавить позицию на склад</DialogTitle>
             <DialogDescription>Заполните информацию с учетом специфики флористики</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -466,11 +466,11 @@ export default function FloristicInventoryPage() {
             </Button>
             <Button
               onClick={() => {
-                alert("Флористический товар добавлен!")
+                alert("Позиция добавлена на склад!")
                 setIsAddProductOpen(false)
               }}
             >
-              Добавить товар
+              Добавить позицию
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -177,46 +177,44 @@ export default function InventoryPage() {
                   </Button>
                 </div>
 
-                <div className="rounded-md border">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b bg-muted/50">
-                          <th className="h-12 px-4 text-left align-middle font-medium">Товар</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Артикул</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Категория</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Остаток</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Цена</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Статус</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Действия</th>
+                <div className="rounded-md border overflow-x-auto">
+                  <table className="w-full min-w-[700px]">
+                    <thead>
+                      <tr className="border-b bg-muted/50">
+                        <th className="h-12 px-4 text-left align-middle font-medium min-w-[200px]">Товар</th>
+                        <th className="h-12 px-4 text-left align-middle font-medium min-w-[100px]">Артикул</th>
+                        <th className="h-12 px-4 text-left align-middle font-medium min-w-[120px]">Категория</th>
+                        <th className="h-12 px-4 text-left align-middle font-medium min-w-[100px]">Остаток</th>
+                        <th className="h-12 px-4 text-left align-middle font-medium min-w-[100px]">Цена</th>
+                        <th className="h-12 px-4 text-left align-middle font-medium min-w-[100px]">Статус</th>
+                        <th className="h-12 px-4 text-left align-middle font-medium min-w-[180px]">Действия</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {products.map((product) => (
+                        <tr key={product.id} className="border-b hover:bg-muted/50">
+                          <td className="p-4 font-medium">{product.name}</td>
+                          <td className="p-4 text-muted-foreground">{product.sku}</td>
+                          <td className="p-4">{product.category}</td>
+                          <td className="p-4">{product.stock} шт.</td>
+                          <td className="p-4">₽{product.price.toLocaleString()}</td>
+                          <td className="p-4">
+                            <Badge className={getStatusColor(product.status)}>{product.status}</Badge>
+                          </td>
+                          <td className="p-4">
+                            <div className="flex gap-2">
+                              <Button variant="ghost" size="sm" onClick={() => handleEditProduct(product)}>
+                                Изменить
+                              </Button>
+                              <Button variant="ghost" size="sm" onClick={() => handleDeleteProduct(product)}>
+                                Удалить
+                              </Button>
+                            </div>
+                          </td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {products.map((product) => (
-                          <tr key={product.id} className="border-b hover:bg-muted/50">
-                            <td className="p-4 font-medium">{product.name}</td>
-                            <td className="p-4 text-muted-foreground">{product.sku}</td>
-                            <td className="p-4">{product.category}</td>
-                            <td className="p-4">{product.stock} шт.</td>
-                            <td className="p-4">₽{product.price.toLocaleString()}</td>
-                            <td className="p-4">
-                              <Badge className={getStatusColor(product.status)}>{product.status}</Badge>
-                            </td>
-                            <td className="p-4">
-                              <div className="flex gap-2">
-                                <Button variant="ghost" size="sm" onClick={() => handleEditProduct(product)}>
-                                  Изменить
-                                </Button>
-                                <Button variant="ghost" size="sm" onClick={() => handleDeleteProduct(product)}>
-                                  Удалить
-                                </Button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </CardContent>
             </Card>

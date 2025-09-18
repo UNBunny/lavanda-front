@@ -222,44 +222,46 @@ export default function AnalyticsPage() {
               <CardDescription>Актуальная информация о заказах</CardDescription>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Номер заказа</TableHead>
-                    <TableHead>Клиент</TableHead>
-                    <TableHead>Сумма</TableHead>
-                    <TableHead>Статус</TableHead>
-                    <TableHead>Дата</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentOrders.map((order) => (
-                    <TableRow key={order.id}>
-                      <TableCell className="font-medium">{order.id}</TableCell>
-                      <TableCell>{order.customer}</TableCell>
-                      <TableCell>₽{order.amount.toLocaleString()}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            order.status === "completed"
-                              ? "default"
-                              : order.status === "processing"
-                                ? "secondary"
-                                : "outline"
-                          }
-                        >
-                          {order.status === "completed"
-                            ? "Выполнен"
-                            : order.status === "processing"
-                              ? "В обработке"
-                              : "Ожидает"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{new Date(order.date).toLocaleDateString("ru-RU")}</TableCell>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="min-w-[120px]">Номер заказа</TableHead>
+                      <TableHead className="min-w-[150px]">Клиент</TableHead>
+                      <TableHead className="min-w-[100px]">Сумма</TableHead>
+                      <TableHead className="min-w-[120px]">Статус</TableHead>
+                      <TableHead className="min-w-[100px]">Дата</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {recentOrders.map((order) => (
+                      <TableRow key={order.id}>
+                        <TableCell className="font-medium">{order.id}</TableCell>
+                        <TableCell>{order.customer}</TableCell>
+                        <TableCell>₽{order.amount.toLocaleString()}</TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              order.status === "completed"
+                                ? "default"
+                                : order.status === "processing"
+                                  ? "secondary"
+                                  : "outline"
+                            }
+                          >
+                            {order.status === "completed"
+                              ? "Выполнен"
+                              : order.status === "processing"
+                                ? "В обработке"
+                                : "Ожидает"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{new Date(order.date).toLocaleDateString("ru-RU")}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

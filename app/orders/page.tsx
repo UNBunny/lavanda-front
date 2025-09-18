@@ -218,61 +218,59 @@ export default function OrdersPage() {
                 </div>
 
                 {/* Таблица заказов */}
-                <div className="rounded-md border">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b bg-muted/50">
-                          <th className="h-12 px-4 text-left align-middle font-medium">Заказ</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Клиент</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Товары</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Сумма</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Статус</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Доставка</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Действия</th>
+                <div className="rounded-md border overflow-x-auto">
+                  <table className="w-full min-w-[900px]">
+                    <thead>
+                      <tr className="border-b bg-muted/50">
+                        <th className="h-12 px-4 text-left align-middle font-medium min-w-[140px]">Заказ</th>
+                        <th className="h-12 px-4 text-left align-middle font-medium min-w-[160px]">Клиент</th>
+                        <th className="h-12 px-4 text-left align-middle font-medium min-w-[200px]">Товары</th>
+                        <th className="h-12 px-4 text-left align-middle font-medium min-w-[100px]">Сумма</th>
+                        <th className="h-12 px-4 text-left align-middle font-medium min-w-[120px]">Статус</th>
+                        <th className="h-12 px-4 text-left align-middle font-medium min-w-[140px]">Доставка</th>
+                        <th className="h-12 px-4 text-left align-middle font-medium min-w-[180px]">Действия</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {orders.map((order) => (
+                        <tr key={order.id} className="border-b hover:bg-muted/50">
+                          <td className="p-4">
+                            <div>
+                              <div className="font-medium">{order.id}</div>
+                              <div className="text-sm text-muted-foreground">{order.date}</div>
+                            </div>
+                          </td>
+                          <td className="p-4">
+                            <div>
+                              <div className="font-medium">{order.customer}</div>
+                              <div className="text-sm text-muted-foreground">{order.phone}</div>
+                            </div>
+                          </td>
+                          <td className="p-4 max-w-xs">
+                            <div className="truncate text-sm">{order.items}</div>
+                          </td>
+                          <td className="p-4 font-medium">₽{order.total.toLocaleString()}</td>
+                          <td className="p-4">
+                            <Badge className={`${getStatusColor(order.status)} flex items-center gap-1 w-fit`}>
+                              {getStatusIcon(order.status)}
+                              {order.status}
+                            </Badge>
+                          </td>
+                          <td className="p-4 text-sm text-muted-foreground">{order.delivery}</td>
+                          <td className="p-4">
+                            <div className="flex gap-2">
+                              <Button variant="ghost" size="sm" onClick={() => handleViewOrder(order)}>
+                                Просмотр
+                              </Button>
+                              <Button variant="ghost" size="sm" onClick={() => handleEditOrder(order)}>
+                                Изменить
+                              </Button>
+                            </div>
+                          </td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {orders.map((order) => (
-                          <tr key={order.id} className="border-b hover:bg-muted/50">
-                            <td className="p-4">
-                              <div>
-                                <div className="font-medium">{order.id}</div>
-                                <div className="text-sm text-muted-foreground">{order.date}</div>
-                              </div>
-                            </td>
-                            <td className="p-4">
-                              <div>
-                                <div className="font-medium">{order.customer}</div>
-                                <div className="text-sm text-muted-foreground">{order.phone}</div>
-                              </div>
-                            </td>
-                            <td className="p-4 max-w-xs">
-                              <div className="truncate text-sm">{order.items}</div>
-                            </td>
-                            <td className="p-4 font-medium">₽{order.total.toLocaleString()}</td>
-                            <td className="p-4">
-                              <Badge className={`${getStatusColor(order.status)} flex items-center gap-1 w-fit`}>
-                                {getStatusIcon(order.status)}
-                                {order.status}
-                              </Badge>
-                            </td>
-                            <td className="p-4 text-sm text-muted-foreground">{order.delivery}</td>
-                            <td className="p-4">
-                              <div className="flex gap-2">
-                                <Button variant="ghost" size="sm" onClick={() => handleViewOrder(order)}>
-                                  Просмотр
-                                </Button>
-                                <Button variant="ghost" size="sm" onClick={() => handleEditOrder(order)}>
-                                  Изменить
-                                </Button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </CardContent>
             </Card>

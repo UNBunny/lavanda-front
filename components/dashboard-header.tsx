@@ -33,27 +33,29 @@ export function DashboardHeader() {
   return (
     <>
       <header className="border-b bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/50">
-        <div className="flex h-16 items-center px-6 gap-4">
-          <div className="flex-1 flex items-center gap-4">
-            <div className="relative max-w-md flex-1">
+        <div className="flex h-16 items-center px-3 sm:px-6 gap-2 sm:gap-4">
+          <div className="w-12 md:w-0" />
+
+          <div className="flex-1 flex items-center gap-2 sm:gap-4">
+            <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input placeholder="Поиск по системе..." className="pl-10 bg-background" />
+              <Input placeholder="Поиск..." className="pl-10 bg-background text-sm sm:text-base" />
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={handleNotifications}>
-              <Bell className="h-5 w-5" />
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Button variant="ghost" size="icon" onClick={handleNotifications} className="h-8 w-8 sm:h-10 sm:w-10">
+              <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
 
-            <Button variant="ghost" size="icon" onClick={handleSettings}>
-              <Settings className="h-5 w-5" />
+            <Button variant="ghost" size="icon" onClick={handleSettings} className="h-8 w-8 sm:h-10 sm:w-10">
+              <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <User className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
+                  <User className="h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -70,49 +72,49 @@ export function DashboardHeader() {
       </header>
 
       <Dialog open={isNotificationsOpen} onOpenChange={setIsNotificationsOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-md mx-4 sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Уведомления</DialogTitle>
             <DialogDescription>Последние уведомления системы</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="p-4 border rounded-lg">
-              <p className="font-medium">Новый заказ #ORD-123</p>
-              <p className="text-sm text-muted-foreground">5 минут назад</p>
+          <div className="space-y-4 max-h-96 overflow-y-auto">
+            <div className="p-3 sm:p-4 border rounded-lg">
+              <p className="font-medium text-sm sm:text-base">Новый заказ #ORD-123</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">5 минут назад</p>
             </div>
-            <div className="p-4 border rounded-lg">
-              <p className="font-medium">Критичные остатки товаров</p>
-              <p className="text-sm text-muted-foreground">15 минут назад</p>
+            <div className="p-3 sm:p-4 border rounded-lg">
+              <p className="font-medium text-sm sm:text-base">Критичные остатки товаров</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">15 минут назад</p>
             </div>
-            <div className="p-4 border rounded-lg">
-              <p className="font-medium">Смена закрыта</p>
-              <p className="text-sm text-muted-foreground">2 часа назад</p>
+            <div className="p-3 sm:p-4 border rounded-lg">
+              <p className="font-medium text-sm sm:text-base">Смена закрыта</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">2 часа назад</p>
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
       <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-md mx-4 sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Быстрые настройки</DialogTitle>
             <DialogDescription>Основные настройки системы</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span>Темная тема</span>
+              <span className="text-sm sm:text-base">Темная тема</span>
               <Button variant="outline" size="sm">
                 Переключить
               </Button>
             </div>
             <div className="flex items-center justify-between">
-              <span>Уведомления</span>
+              <span className="text-sm sm:text-base">Уведомления</span>
               <Button variant="outline" size="sm">
                 Настроить
               </Button>
             </div>
             <div className="flex items-center justify-between">
-              <span>Язык интерфейса</span>
+              <span className="text-sm sm:text-base">Язык интерфейса</span>
               <Button variant="outline" size="sm">
                 Русский
               </Button>
