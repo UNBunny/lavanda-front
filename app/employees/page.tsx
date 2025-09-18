@@ -143,25 +143,26 @@ export default function EmployeesPage() {
         <DashboardSidebar />
         <div className="flex-1 flex flex-col">
           <DashboardHeader />
-          <main className="flex-1 p-6 space-y-6">
-            <div className="flex items-center justify-between">
+          <main className="flex-1 p-3 md:p-6 space-y-4 md:space-y-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-balance">Управление сотрудниками</h1>
-                <p className="text-muted-foreground">Кадровый учет, расписание и управление персоналом</p>
+                <h1 className="text-2xl md:text-3xl font-bold text-balance">Управление сотрудниками</h1>
+                <p className="text-sm md:text-base text-muted-foreground">
+                  Кадровый учет, расписание и управление персоналом
+                </p>
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={handleExport}>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button variant="outline" onClick={handleExport} className="w-full sm:w-auto bg-transparent">
                   Экспорт
                 </Button>
-                <Button className="bg-primary hover:bg-primary/90" onClick={handleAddEmployee}>
+                <Button className="bg-primary hover:bg-primary/90 w-full sm:w-auto" onClick={handleAddEmployee}>
                   <Plus className="w-4 h-4 mr-2" />
                   Добавить сотрудника
                 </Button>
               </div>
             </div>
 
-            {/* Статистика сотрудников */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Всего сотрудников</CardTitle>
@@ -204,47 +205,119 @@ export default function EmployeesPage() {
               </Card>
             </div>
 
-            {/* Список сотрудников */}
             <Card>
               <CardHeader>
-                <CardTitle>Список сотрудников</CardTitle>
-                <CardDescription>Управление персоналом и их данными</CardDescription>
+                <CardTitle className="text-lg md:text-xl">Список сотрудников</CardTitle>
+                <CardDescription className="text-sm">Управление персоналом и их данными</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex gap-4 mb-6">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-4 md:mb-6">
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Поиск по имени, должности или отделу..." className="pl-10" />
+                    <Input placeholder="Поиск по имени, должности или отделу..." className="pl-10 text-sm" />
                   </div>
-                  <Button variant="outline" onClick={handleFilter}>
+                  <Button variant="outline" onClick={handleFilter} className="w-full sm:w-auto bg-transparent">
                     <Filter className="w-4 h-4 mr-2" />
                     Фильтры
                   </Button>
                 </div>
 
-                {/* Таблица сотрудников */}
                 <div className="rounded-md border">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
+                  <div className="block md:hidden">
+                    <div className="space-y-3 p-3">
+                      {employees.map((employee) => (
+                        <Card key={employee.id} className="p-4">
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-10 w-10">
+                                <AvatarImage src={employee.avatar || "/placeholder.svg"} alt={employee.name} />
+                                <AvatarFallback className="text-xs">
+                                  {employee.name
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <div className="font-medium text-sm">{employee.name}</div>
+                                <div className="text-xs text-muted-foreground">{employee.position}</div>
+                              </div>
+                              <Badge className={`${getStatusColor(employee.status)} text-xs`}>{employee.status}</Badge>
+                            </div>
+                            <div>
+                              <Badge className={`${getDepartmentColor(employee.department)} text-xs mb-2`}>
+                                {employee.department}
+                              </Badge>
+                              <div className="text-xs space-y-1">
+                                <div className="truncate">{employee.email}</div>
+                                <div className="text-muted-foreground">{employee.phone}</div>
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="font-medium text-sm">₽{employee.salary.toLocaleString()}</div>
+                              <div className="text-xs text-muted-foreground">
+                                С {new Date(employee.startDate).toLocaleDateString("ru-RU")}
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleViewProfile(employee)}
+                                className="text-xs h-7 flex-1"
+                              >
+                                Профиль
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditEmployee(employee)}
+                                className="text-xs h-7 flex-1"
+                              >
+                                Изменить
+                              </Button>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="w-full min-w-[800px]">
                       <thead>
                         <tr className="border-b bg-muted/50">
-                          <th className="h-12 px-4 text-left align-middle font-medium">Сотрудник</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Должность</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Отдел</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Контакты</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Статус</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Зарплата</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Действия</th>
+                          <th className="h-10 md:h-12 px-2 md:px-4 text-left align-middle font-medium text-xs md:text-sm">
+                            Сотрудник
+                          </th>
+                          <th className="h-10 md:h-12 px-2 md:px-4 text-left align-middle font-medium text-xs md:text-sm">
+                            Должность
+                          </th>
+                          <th className="h-10 md:h-12 px-2 md:px-4 text-left align-middle font-medium text-xs md:text-sm">
+                            Отдел
+                          </th>
+                          <th className="h-10 md:h-12 px-2 md:px-4 text-left align-middle font-medium text-xs md:text-sm">
+                            Контакты
+                          </th>
+                          <th className="h-10 md:h-12 px-2 md:px-4 text-left align-middle font-medium text-xs md:text-sm">
+                            Статус
+                          </th>
+                          <th className="h-10 md:h-12 px-2 md:px-4 text-left align-middle font-medium text-xs md:text-sm">
+                            Зарплата
+                          </th>
+                          <th className="h-10 md:h-12 px-2 md:px-4 text-left align-middle font-medium text-xs md:text-sm">
+                            Действия
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         {employees.map((employee) => (
                           <tr key={employee.id} className="border-b hover:bg-muted/50">
-                            <td className="p-4">
-                              <div className="flex items-center gap-3">
-                                <Avatar className="h-10 w-10">
+                            <td className="p-2 md:p-4">
+                              <div className="flex items-center gap-2 md:gap-3">
+                                <Avatar className="h-8 w-8 md:h-10 md:w-10">
                                   <AvatarImage src={employee.avatar || "/placeholder.svg"} alt={employee.name} />
-                                  <AvatarFallback>
+                                  <AvatarFallback className="text-xs">
                                     {employee.name
                                       .split(" ")
                                       .map((n) => n[0])
@@ -252,33 +325,47 @@ export default function EmployeesPage() {
                                   </AvatarFallback>
                                 </Avatar>
                                 <div>
-                                  <div className="font-medium">{employee.name}</div>
-                                  <div className="text-sm text-muted-foreground">
+                                  <div className="font-medium text-xs md:text-sm">{employee.name}</div>
+                                  <div className="text-xs text-muted-foreground">
                                     С {new Date(employee.startDate).toLocaleDateString("ru-RU")}
                                   </div>
                                 </div>
                               </div>
                             </td>
-                            <td className="p-4 font-medium">{employee.position}</td>
-                            <td className="p-4">
-                              <Badge className={getDepartmentColor(employee.department)}>{employee.department}</Badge>
+                            <td className="p-2 md:p-4 font-medium text-xs md:text-sm">{employee.position}</td>
+                            <td className="p-2 md:p-4">
+                              <Badge className={`${getDepartmentColor(employee.department)} text-xs`}>
+                                {employee.department}
+                              </Badge>
                             </td>
-                            <td className="p-4">
-                              <div className="text-sm">
-                                <div>{employee.email}</div>
+                            <td className="p-2 md:p-4">
+                              <div className="text-xs">
+                                <div className="truncate max-w-[150px]">{employee.email}</div>
                                 <div className="text-muted-foreground">{employee.phone}</div>
                               </div>
                             </td>
-                            <td className="p-4">
-                              <Badge className={getStatusColor(employee.status)}>{employee.status}</Badge>
+                            <td className="p-2 md:p-4">
+                              <Badge className={`${getStatusColor(employee.status)} text-xs`}>{employee.status}</Badge>
                             </td>
-                            <td className="p-4 font-medium">₽{employee.salary.toLocaleString()}</td>
-                            <td className="p-4">
-                              <div className="flex gap-2">
-                                <Button variant="ghost" size="sm" onClick={() => handleViewProfile(employee)}>
+                            <td className="p-2 md:p-4 font-medium text-xs md:text-sm">
+                              ₽{employee.salary.toLocaleString()}
+                            </td>
+                            <td className="p-2 md:p-4">
+                              <div className="flex flex-col lg:flex-row gap-1 lg:gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleViewProfile(employee)}
+                                  className="text-xs h-7"
+                                >
                                   Профиль
                                 </Button>
-                                <Button variant="ghost" size="sm" onClick={() => handleEditEmployee(employee)}>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleEditEmployee(employee)}
+                                  className="text-xs h-7"
+                                >
                                   Изменить
                                 </Button>
                               </div>
@@ -295,25 +382,28 @@ export default function EmployeesPage() {
         </div>
       </div>
 
-      {/* Модальные окна для добавления сотрудника и фильтров */}
       <Dialog open={isAddEmployeeOpen} onOpenChange={setIsAddEmployeeOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Добавить нового сотрудника</DialogTitle>
-            <DialogDescription>Заполните информацию о новом сотруднике</DialogDescription>
+            <DialogTitle className="text-lg md:text-xl">Добавить нового сотрудника</DialogTitle>
+            <DialogDescription className="text-sm">Заполните информацию о новом сотруднике</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-3 md:gap-4 py-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Полное имя</Label>
-                <Input id="name" placeholder="Иван Иванов" />
+                <Label htmlFor="name" className="text-sm">
+                  Полное имя
+                </Label>
+                <Input id="name" placeholder="Иван Иванов" className="text-sm" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="position">Должность</Label>
-                <Input id="position" placeholder="Флорист" />
+                <Label htmlFor="position" className="text-sm">
+                  Должность
+                </Label>
+                <Input id="position" placeholder="Флорист" className="text-sm" />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
               <div className="space-y-2">
                 <Label htmlFor="department">Отдел</Label>
                 <Select>
@@ -331,17 +421,17 @@ export default function EmployeesPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="salary">Зарплата</Label>
-                <Input id="salary" type="number" placeholder="45000" />
+                <Input id="salary" type="number" placeholder="45000" className="text-sm" />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="ivan@company.com" />
+                <Input id="email" type="email" placeholder="ivan@company.com" className="text-sm" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Телефон</Label>
-                <Input id="phone" placeholder="+7 (999) 123-45-67" />
+                <Input id="phone" placeholder="+7 (999) 123-45-67" className="text-sm" />
               </div>
             </div>
             <div className="space-y-2">
@@ -349,8 +439,8 @@ export default function EmployeesPage() {
               <Input id="startDate" type="date" />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddEmployeeOpen(false)}>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => setIsAddEmployeeOpen(false)} className="w-full sm:w-auto">
               Отмена
             </Button>
             <Button
@@ -358,6 +448,7 @@ export default function EmployeesPage() {
                 alert("Сотрудник добавлен!")
                 setIsAddEmployeeOpen(false)
               }}
+              className="w-full sm:w-auto"
             >
               Добавить сотрудника
             </Button>

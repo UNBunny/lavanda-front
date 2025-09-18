@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
-import { TrendingUp, DollarSign, CreditCard, Wallet, FileText, Download } from "lucide-react"
+import { TrendingUp, Banknote, CreditCard, Wallet, FileText, Download } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 export default function FinancePage() {
@@ -105,30 +105,29 @@ export default function FinancePage() {
         <DashboardSidebar />
         <div className="flex-1 flex flex-col">
           <DashboardHeader />
-          <main className="flex-1 p-6 space-y-6">
-            <div className="flex items-center justify-between">
+          <main className="flex-1 p-3 md:p-6 space-y-4 md:space-y-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-balance">Финансы и отчеты</h1>
-                <p className="text-muted-foreground">Управление финансами, доходами и расходами</p>
+                <h1 className="text-2xl md:text-3xl font-bold text-balance">Финансы и отчеты</h1>
+                <p className="text-sm md:text-base text-muted-foreground">Управление финансами, доходами и расходами</p>
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={handleExport}>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button variant="outline" onClick={handleExport} className="w-full sm:w-auto bg-transparent">
                   <Download className="w-4 h-4 mr-2" />
                   Экспорт
                 </Button>
-                <Button className="bg-primary hover:bg-primary/90" onClick={handleCreateReport}>
+                <Button className="bg-primary hover:bg-primary/90 w-full sm:w-auto" onClick={handleCreateReport}>
                   <FileText className="w-4 h-4 mr-2" />
                   Создать отчет
                 </Button>
               </div>
             </div>
 
-            {/* Финансовая статистика */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Общий доход</CardTitle>
-                  <DollarSign className="h-4 w-4 text-green-500" />
+                  <Banknote className="h-4 w-4 text-green-500" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-green-600">₽3,360,000</div>
@@ -179,20 +178,18 @@ export default function FinancePage() {
               </Card>
             </div>
 
-            {/* Графики */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* График доходов и расходов */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Доходы и расходы</CardTitle>
-                  <CardDescription>Динамика за последние 6 месяцев</CardDescription>
+                  <CardTitle className="text-lg md:text-xl">Доходы и расходы</CardTitle>
+                  <CardDescription className="text-sm">Динамика за последние 6 месяцев</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
+                  <ResponsiveContainer width="100%" height={250} className="md:h-[300px]">
                     <BarChart data={monthlyRevenue}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
+                      <XAxis dataKey="month" fontSize={12} />
+                      <YAxis fontSize={12} />
                       <Tooltip
                         formatter={(value: number) => [`₽${value.toLocaleString()}`, ""]}
                         labelFormatter={(label) => `Месяц: ${label}`}
@@ -204,23 +201,23 @@ export default function FinancePage() {
                 </CardContent>
               </Card>
 
-              {/* Структура расходов */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Структура расходов</CardTitle>
-                  <CardDescription>Распределение расходов по категориям</CardDescription>
+                  <CardTitle className="text-lg md:text-xl">Структура расходов</CardTitle>
+                  <CardDescription className="text-sm">Распределение расходов по категориям</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
+                  <ResponsiveContainer width="100%" height={250} className="md:h-[300px]">
                     <PieChart>
                       <Pie
                         data={expenseCategories}
                         cx="50%"
                         cy="50%"
-                        outerRadius={100}
+                        outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
                         label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        fontSize={10}
                       >
                         {expenseCategories.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
@@ -233,46 +230,92 @@ export default function FinancePage() {
               </Card>
             </div>
 
-            {/* Последние транзакции */}
             <Card>
               <CardHeader>
-                <CardTitle>Последние транзакции</CardTitle>
-                <CardDescription>История финансовых операций</CardDescription>
+                <CardTitle className="text-lg md:text-xl">Последние транзакции</CardTitle>
+                <CardDescription className="text-sm">История финансовых операций</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="rounded-md border">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
+                  <div className="block md:hidden">
+                    <div className="space-y-3 p-3">
+                      {recentTransactions.map((transaction) => (
+                        <Card key={transaction.id} className="p-4">
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <Badge
+                                className={`text-xs ${
+                                  transaction.type === "Доход"
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
+                              >
+                                {transaction.type}
+                              </Badge>
+                              <Badge className={`${getStatusColor(transaction.status)} text-xs`}>
+                                {transaction.status}
+                              </Badge>
+                            </div>
+                            <div className="text-sm line-clamp-2">{transaction.description}</div>
+                            <div className="flex items-center justify-between">
+                              <div className={`font-medium text-sm ${getTransactionColor(transaction.type)}`}>
+                                {transaction.amount > 0 ? "+" : ""}₽{Math.abs(transaction.amount).toLocaleString()}
+                              </div>
+                              <div className="text-xs text-muted-foreground">{transaction.date}</div>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="w-full min-w-[600px]">
                       <thead>
                         <tr className="border-b bg-muted/50">
-                          <th className="h-12 px-4 text-left align-middle font-medium">Тип</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Описание</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Сумма</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Дата</th>
-                          <th className="h-12 px-4 text-left align-middle font-medium">Статус</th>
+                          <th className="h-10 md:h-12 px-2 md:px-4 text-left align-middle font-medium text-xs md:text-sm">
+                            Тип
+                          </th>
+                          <th className="h-10 md:h-12 px-2 md:px-4 text-left align-middle font-medium text-xs md:text-sm">
+                            Описание
+                          </th>
+                          <th className="h-10 md:h-12 px-2 md:px-4 text-left align-middle font-medium text-xs md:text-sm">
+                            Сумма
+                          </th>
+                          <th className="h-10 md:h-12 px-2 md:px-4 text-left align-middle font-medium text-xs md:text-sm">
+                            Дата
+                          </th>
+                          <th className="h-10 md:h-12 px-2 md:px-4 text-left align-middle font-medium text-xs md:text-sm">
+                            Статус
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         {recentTransactions.map((transaction) => (
                           <tr key={transaction.id} className="border-b hover:bg-muted/50">
-                            <td className="p-4">
+                            <td className="p-2 md:p-4">
                               <Badge
-                                className={
+                                className={`text-xs ${
                                   transaction.type === "Доход"
                                     ? "bg-green-100 text-green-800"
                                     : "bg-red-100 text-red-800"
-                                }
+                                }`}
                               >
                                 {transaction.type}
                               </Badge>
                             </td>
-                            <td className="p-4">{transaction.description}</td>
-                            <td className={`p-4 font-medium ${getTransactionColor(transaction.type)}`}>
+                            <td className="p-2 md:p-4 text-xs md:text-sm max-w-[200px] truncate">
+                              {transaction.description}
+                            </td>
+                            <td
+                              className={`p-2 md:p-4 font-medium text-xs md:text-sm ${getTransactionColor(transaction.type)}`}
+                            >
                               {transaction.amount > 0 ? "+" : ""}₽{Math.abs(transaction.amount).toLocaleString()}
                             </td>
-                            <td className="p-4 text-muted-foreground">{transaction.date}</td>
-                            <td className="p-4">
-                              <Badge className={getStatusColor(transaction.status)}>{transaction.status}</Badge>
+                            <td className="p-2 md:p-4 text-muted-foreground text-xs">{transaction.date}</td>
+                            <td className="p-2 md:p-4">
+                              <Badge className={`${getStatusColor(transaction.status)} text-xs`}>
+                                {transaction.status}
+                              </Badge>
                             </td>
                           </tr>
                         ))}
@@ -286,17 +329,16 @@ export default function FinancePage() {
         </div>
       </div>
 
-      {/* Модальные окна для экспорта и создания отчетов */}
       <Dialog open={isExportOpen} onOpenChange={setIsExportOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-[95vw] sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Экспорт финансовых данных</DialogTitle>
-            <DialogDescription>Выберите данные для экспорта</DialogDescription>
+            <DialogTitle className="text-lg">Экспорт финансовых данных</DialogTitle>
+            <DialogDescription className="text-sm">Выберите данные для экспорта</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <h4 className="font-medium">Доступные форматы:</h4>
-              <div className="flex gap-2">
+              <h4 className="font-medium text-sm">Доступные форматы:</h4>
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -304,6 +346,7 @@ export default function FinancePage() {
                     alert("Экспорт в Excel начат")
                     setIsExportOpen(false)
                   }}
+                  className="w-full sm:w-auto text-xs"
                 >
                   Excel (.xlsx)
                 </Button>
@@ -314,6 +357,7 @@ export default function FinancePage() {
                     alert("Экспорт в PDF начат")
                     setIsExportOpen(false)
                   }}
+                  className="w-full sm:w-auto text-xs"
                 >
                   PDF
                 </Button>
@@ -324,13 +368,14 @@ export default function FinancePage() {
                     alert("Экспорт в CSV начат")
                     setIsExportOpen(false)
                   }}
+                  className="w-full sm:w-auto text-xs"
                 >
                   CSV
                 </Button>
               </div>
             </div>
             <div className="space-y-2">
-              <h4 className="font-medium">Данные для экспорта:</h4>
+              <h4 className="font-medium text-sm">Данные для экспорта:</h4>
               <div className="space-y-2">
                 <label className="flex items-center space-x-2">
                   <input type="checkbox" defaultChecked />
@@ -351,14 +396,14 @@ export default function FinancePage() {
       </Dialog>
 
       <Dialog open={isReportOpen} onOpenChange={setIsReportOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-[95vw] sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Создать финансовый отчет</DialogTitle>
-            <DialogDescription>Настройте параметры отчета</DialogDescription>
+            <DialogTitle className="text-lg">Создать финансовый отчет</DialogTitle>
+            <DialogDescription className="text-sm">Настройте параметры отчета</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <h4 className="font-medium">Тип отчета:</h4>
+              <h4 className="font-medium text-sm">Тип отчета:</h4>
               <div className="grid grid-cols-2 gap-2">
                 <Button
                   variant="outline"
@@ -367,6 +412,7 @@ export default function FinancePage() {
                     alert("Создается отчет о прибылях и убытках")
                     setIsReportOpen(false)
                   }}
+                  className="text-xs"
                 >
                   Прибыли и убытки
                 </Button>
@@ -377,6 +423,7 @@ export default function FinancePage() {
                     alert("Создается баланс")
                     setIsReportOpen(false)
                   }}
+                  className="text-xs"
                 >
                   Баланс
                 </Button>
@@ -387,6 +434,7 @@ export default function FinancePage() {
                     alert("Создается отчет о движении денежных средств")
                     setIsReportOpen(false)
                   }}
+                  className="text-xs"
                 >
                   Движение средств
                 </Button>
@@ -397,21 +445,22 @@ export default function FinancePage() {
                     alert("Создается налоговый отчет")
                     setIsReportOpen(false)
                   }}
+                  className="text-xs"
                 >
                   Налоговый отчет
                 </Button>
               </div>
             </div>
             <div className="space-y-2">
-              <h4 className="font-medium">Период:</h4>
+              <h4 className="font-medium text-sm">Период:</h4>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="text-xs bg-transparent">
                   Текущий месяц
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="text-xs bg-transparent">
                   Квартал
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="text-xs bg-transparent">
                   Год
                 </Button>
               </div>

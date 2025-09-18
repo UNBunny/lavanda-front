@@ -8,7 +8,7 @@ import {
   Package,
   ShoppingCart,
   Users,
-  DollarSign,
+  Banknote,
   Settings,
   Menu,
   X,
@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
+import { LavandaLogo } from "@/components/lavanda-logo"
 
 const navigation = [
   { name: "Главная", href: "/", icon: Home },
@@ -30,7 +31,7 @@ const navigation = [
   { name: "Флористический склад", href: "/floristic-inventory", icon: Leaf },
   { name: "Заказы", href: "/orders", icon: ShoppingCart },
   { name: "Сотрудники", href: "/employees", icon: Users },
-  { name: "Финансы", href: "/finance", icon: DollarSign },
+  { name: "Финансы", href: "/finance", icon: Banknote },
   { name: "Скидки", href: "/discounts", icon: Percent },
   { name: "Конструктор букетов", href: "/bouquet-builder", icon: Flower },
   { name: "Календарь свежести", href: "/freshness", icon: Calendar },
@@ -114,12 +115,7 @@ export function DashboardSidebar() {
           </SheetTrigger>
           <SheetContent side="left" className="w-64 p-0">
             <div className="flex h-16 items-center px-4 border-b border-sidebar-border">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <BarChart3 className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <span className="font-bold text-lg">ERP System</span>
-              </div>
+              <LavandaLogo />
             </div>
             <nav className="p-4 space-y-2">
               <NavigationItems onItemClick={() => setIsSheetOpen(false)} />
@@ -142,14 +138,7 @@ export function DashboardSidebar() {
         <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(!isCollapsed)} className="mr-2">
           {isCollapsed ? <Menu className="h-5 w-5" /> : <X className="h-5 w-5" />}
         </Button>
-        {!isCollapsed && (
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <BarChart3 className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-lg">ERP System</span>
-          </div>
-        )}
+        {!isCollapsed && <LavandaLogo />}
       </div>
 
       <nav className="p-4 space-y-2">

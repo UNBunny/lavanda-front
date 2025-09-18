@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Bell, Search, Settings, User } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Bell, Search, Settings, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -17,6 +18,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 export function DashboardHeader() {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const router = useRouter()
 
   const handleNotifications = () => {
     setIsNotificationsOpen(true)
@@ -27,8 +29,12 @@ export function DashboardHeader() {
   }
 
   const handleLogout = () => {
-    alert("Выход из системы")
+    localStorage.removeItem("isAuthenticated")
+    localStorage.removeItem("userEmail")
+    router.push("/login")
   }
+
+  const userEmail = typeof window !== "undefined" ? localStorage.getItem("userEmail") : null
 
   return (
     <>
@@ -59,12 +65,15 @@ export function DashboardHeader() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Мой аккаунт</DropdownMenuLabel>
+                <DropdownMenuLabel>{userEmail ? userEmail : "Мой аккаунт"}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Профиль</DropdownMenuItem>
                 <DropdownMenuItem onClick={handleSettings}>Настройки</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>Выйти</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Выйти
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

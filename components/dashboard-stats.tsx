@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { DollarSign, ShoppingCart, Package, Users, TrendingUp, TrendingDown } from "lucide-react"
+import { Banknote, ShoppingCart, Package, Users, TrendingUp, TrendingDown } from "lucide-react"
 
 const stats = [
   {
@@ -7,7 +7,7 @@ const stats = [
     value: "₽2,847,500",
     change: "+12.5%",
     trend: "up",
-    icon: DollarSign,
+    icon: Banknote,
   },
   {
     title: "Заказы",
@@ -34,20 +34,22 @@ const stats = [
 
 export function DashboardStats() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
       {stats.map((stat) => (
         <Card key={stat.title} className="hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{stat.title}</CardTitle>
-            <stat.icon className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground text-balance">
+              {stat.title}
+            </CardTitle>
+            <stat.icon className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stat.value}</div>
-            <div className="flex items-center gap-1 text-xs">
+          <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold">{stat.value}</div>
+            <div className="flex items-center gap-1 text-xs mt-1">
               {stat.trend === "up" ? (
-                <TrendingUp className="h-3 w-3 text-emerald-500" />
+                <TrendingUp className="h-3 w-3 text-emerald-500 flex-shrink-0" />
               ) : (
-                <TrendingDown className="h-3 w-3 text-red-500" />
+                <TrendingDown className="h-3 w-3 text-red-500 flex-shrink-0" />
               )}
               <span className={stat.trend === "up" ? "text-emerald-500" : "text-red-500"}>{stat.change}</span>
               <span className="text-muted-foreground">за месяц</span>

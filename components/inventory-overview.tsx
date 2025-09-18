@@ -14,19 +14,19 @@ const inventory = [
 export function InventoryOverview() {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Остатки товаров</CardTitle>
+      <CardHeader className="px-3 sm:px-6 pt-3 sm:pt-6">
+        <CardTitle className="text-base sm:text-lg">Остатки товаров</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3 sm:space-y-4 px-3 sm:px-6 pb-3 sm:pb-6">
         {inventory.map((item) => (
           <div key={item.name} className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="font-medium">{item.name}</span>
-              <span className="text-muted-foreground">
+            <div className="flex justify-between items-center text-xs sm:text-sm">
+              <span className="font-medium text-balance">{item.name}</span>
+              <span className="text-muted-foreground flex-shrink-0 ml-2">
                 {item.current}/{item.max}
               </span>
             </div>
-            <Progress value={item.percentage} className="h-2" />
+            <Progress value={item.percentage} className="h-1.5 sm:h-2" />
           </div>
         ))}
       </CardContent>

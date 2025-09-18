@@ -63,32 +63,35 @@ export function RecentOrders() {
   return (
     <>
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Последние заказы</CardTitle>
-          <Button variant="outline" size="sm" onClick={handleAllOrders}>
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 px-3 sm:px-6 pt-3 sm:pt-6">
+          <CardTitle className="text-base sm:text-lg">Последние заказы</CardTitle>
+          <Button variant="outline" size="sm" onClick={handleAllOrders} className="w-full sm:w-auto bg-transparent">
             Все заказы
           </Button>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+        <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+          <div className="space-y-3 sm:space-y-4">
             {orders.map((order) => (
               <div
                 key={order.id}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border rounded-lg hover:bg-muted/50 transition-colors space-y-2 sm:space-y-0"
               >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{order.id}</span>
-                    <Badge variant="secondary" className={statusColors[order.status as keyof typeof statusColors]}>
+                <div className="space-y-1 flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                    <span className="font-medium text-sm sm:text-base">{order.id}</span>
+                    <Badge
+                      variant="secondary"
+                      className={`${statusColors[order.status as keyof typeof statusColors]} text-xs w-fit`}
+                    >
                       {statusLabels[order.status as keyof typeof statusLabels]}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">{order.customer}</p>
-                  <p className="text-sm">{order.product}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{order.customer}</p>
+                  <p className="text-xs sm:text-sm text-balance">{order.product}</p>
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold">{order.amount}</p>
-                  <p className="text-sm text-muted-foreground">{order.date}</p>
+                <div className="text-left sm:text-right flex-shrink-0">
+                  <p className="font-semibold text-sm sm:text-base">{order.amount}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{order.date}</p>
                 </div>
               </div>
             ))}
@@ -97,12 +100,12 @@ export function RecentOrders() {
       </Card>
 
       <Dialog open={isAllOrdersOpen} onOpenChange={setIsAllOrdersOpen}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] mx-2 sm:mx-auto">
           <DialogHeader>
-            <DialogTitle>Все заказы</DialogTitle>
-            <DialogDescription>Полный список заказов за последние 30 дней</DialogDescription>
+            <DialogTitle className="text-base sm:text-lg">Все заказы</DialogTitle>
+            <DialogDescription className="text-sm">Полный список заказов за последние 30 дней</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 max-h-96 overflow-y-auto">
+          <div className="space-y-3 sm:space-y-4 max-h-[60vh] overflow-y-auto">
             {orders
               .concat([
                 {
@@ -125,21 +128,24 @@ export function RecentOrders() {
               .map((order) => (
                 <div
                   key={order.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border rounded-lg hover:bg-muted/50 transition-colors space-y-2 sm:space-y-0"
                 >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{order.id}</span>
-                      <Badge variant="secondary" className={statusColors[order.status as keyof typeof statusColors]}>
+                  <div className="space-y-1 flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                      <span className="font-medium text-sm sm:text-base">{order.id}</span>
+                      <Badge
+                        variant="secondary"
+                        className={`${statusColors[order.status as keyof typeof statusColors]} text-xs w-fit`}
+                      >
                         {statusLabels[order.status as keyof typeof statusLabels]}
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">{order.customer}</p>
-                    <p className="text-sm">{order.product}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{order.customer}</p>
+                    <p className="text-xs sm:text-sm text-balance">{order.product}</p>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold">{order.amount}</p>
-                    <p className="text-sm text-muted-foreground">{order.date}</p>
+                  <div className="text-left sm:text-right flex-shrink-0">
+                    <p className="font-semibold text-sm sm:text-base">{order.amount}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{order.date}</p>
                   </div>
                 </div>
               ))}

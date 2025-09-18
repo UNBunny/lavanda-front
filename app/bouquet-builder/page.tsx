@@ -9,12 +9,12 @@ import {
   Minus,
   Save,
   Eye,
-  Calculator,
   FlowerIcon,
   Star,
   RotateCcw,
-  Download,
   Package,
+  Calculator,
+  Download,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -71,7 +71,7 @@ const flowers: Flower[] = [
     color: "red",
     availability: 50,
     compatibility: ["white", "pink", "cream"],
-    image: "/red-rose.png",
+    image: "/red-rose.jpg",
     season: "all",
   },
   {
@@ -233,8 +233,30 @@ export default function BouquetBuilderPage() {
   const [markup, setMarkup] = useState([50])
   const [activeTab, setActiveTab] = useState("builder")
 
+  const [calcDisplay, setCalcDisplay] = useState("0")
+  const [calcPrevValue, setCalcPrevValue] = useState<number | null>(null)
+  const [calcOperation, setCalcOperation] = useState<string | null>(null)
+  const [calcWaitingForOperand, setCalcWaitingForOperand] = useState(false)
+
   const totalCost = selectedFlowers.reduce((sum, item) => sum + item.flower.price * item.quantity, 0)
   const additionalCost = selectedAdditionalItems.reduce((sum, item) => sum + item.item.price * item.quantity, 0)
+
+  const [manualFlowerCost, setManualFlowerCost] = useState(0)
+  const [materialCost, setMaterialCost] = useState(0)
+  const [competitivePrice, setCompetitivePrice] = useState(260)
+  const [premiumPrice, setPremiumPrice] = useState(400)
+
+  const flowerCost = totalCost > 0 ? totalCost : manualFlowerCost
+  const totalMaterialCost = additionalCost > 0 ? additionalCost : materialCost
+
+  const floristWork = Math.round((flowerCost * 20) / 100)
+
+  const totalBaseCost = flowerCost + totalMaterialCost + floristWork
+  const markupAmount = (totalBaseCost * markup[0]) / 100
+  const finalCalculatedPrice = totalBaseCost + markupAmount
+  const margin = totalBaseCost > 0 ? ((finalCalculatedPrice - totalBaseCost) / finalCalculatedPrice) * 100 : 0
+  const profit = finalCalculatedPrice - totalBaseCost
+
   const finalPrice = (totalCost + additionalCost) * (1 + markup[0] / 100)
 
   const addFlower = (flower: Flower) => {
@@ -330,47 +352,129 @@ export default function BouquetBuilderPage() {
     {} as Record<string, AdditionalItem[]>,
   )
 
+  const inputDigit = (digit: string) => {
+    if (calcWaitingForOperand) {
+      setCalcDisplay(digit)
+      setCalcWaitingForOperand(false)
+    } else {
+      setCalcDisplay(calcDisplay === "0" ? digit : calcDisplay + digit)
+    }
+  }
+
+  const inputDecimal = () => {
+    if (calcWaitingForOperand) {
+      setCalcDisplay("0.")
+      setCalcWaitingForOperand(false)
+    } else if (calcDisplay.indexOf(".") === -1) {
+      setCalcDisplay(calcDisplay + ".")
+    }
+  }
+
+  const clear = () => {
+    setCalcDisplay("0")
+    setCalcPrevValue(null)
+    setCalcOperation(null)
+    setCalcWaitingForOperand(false)
+  }
+
+  const performOperation = (nextOperation: string) => {
+    const inputValue = Number.parseFloat(calcDisplay)
+
+    if (calcPrevValue === null) {
+      setCalcPrevValue(inputValue)
+    } else if (calcOperation) {
+      const currentValue = calcPrevValue || 0
+      const newValue = calculate(currentValue, inputValue, calcOperation)
+
+      setCalcDisplay(String(newValue))
+      setCalcPrevValue(newValue)
+    }
+
+    setCalcWaitingForOperand(true)
+    setCalcOperation(nextOperation)
+  }
+
+  const calculate = (firstValue: number, secondValue: number, operation: string) => {
+    switch (operation) {
+      case "+":
+        return firstValue + secondValue
+      case "-":
+        return firstValue - secondValue
+      case "×":
+        return firstValue * secondValue
+      case "÷":
+        return firstValue / secondValue
+      case "=":
+        return secondValue
+      default:
+        return secondValue
+    }
+  }
+
+  const handleCalculation = () => {
+    const inputValue = Number.parseFloat(calcDisplay)
+
+    if (calcPrevValue !== null && calcOperation) {
+      const newValue = calculate(calcPrevValue, inputValue, calcOperation)
+      setCalcDisplay(String(newValue))
+      setCalcPrevValue(null)
+      setCalcOperation(null)
+      setCalcWaitingForOperand(true)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation Header */}
-      <div className="bg-card border-b border-border p-4">
+      <div className="bg-card border-b border-border p-3 md:p-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             <Link href="/">
               <Button variant="outline" size="sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                На главную
+                <ArrowLeft className="h-4 w-4 mr-1 md:mr-2" />
+                <span className="hidden sm:inline">На главную</span>
+                <span className="sm:hidden">Главная</span>
               </Button>
             </Link>
             <Link href="/inventory">
               <Button variant="outline" size="sm">
-                <Home className="h-4 w-4 mr-2" />К товарам
+                <Home className="h-4 w-4 mr-1 md:mr-2" />
+                <span className="hidden sm:inline">К товарам</span>
+                <span className="sm:hidden">Товары</span>
               </Button>
             </Link>
           </div>
-          <h1 className="text-2xl font-bold text-foreground">Конструктор букетов</h1>
+          <h1 className="text-base md:text-2xl font-bold text-foreground text-balance">
+            <span className="hidden md:inline">Конструктор букетов</span>
+            <span className="md:hidden">Конструктор</span>
+          </h1>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={clearBouquet}>
-              <RotateCcw className="h-4 w-4 mr-2" />
-              Очистить
+              <RotateCcw className="h-4 w-4 mr-1 md:mr-2" />
+              <span className="hidden sm:inline">Очистить</span>
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto p-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="builder">Конструктор</TabsTrigger>
-            <TabsTrigger value="templates">Шаблоны</TabsTrigger>
-            <TabsTrigger value="preview">3D Превью</TabsTrigger>
-            <TabsTrigger value="calculator">Калькулятор</TabsTrigger>
+      <div className="container mx-auto p-3 md:p-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 md:space-y-6">
+          <TabsList className="grid w-full grid-cols-3 gap-1">
+            <TabsTrigger value="builder" className="text-xs md:text-sm">
+              Конструктор
+            </TabsTrigger>
+            <TabsTrigger value="templates" className="text-xs md:text-sm">
+              Шаблоны
+            </TabsTrigger>
+            <TabsTrigger value="calculator" className="text-xs md:text-sm">
+              Калькулятор
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="builder" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <TabsContent value="builder" className="space-y-4 md:space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
               {/* Flower Selection */}
-              <div className="lg:col-span-2 space-y-6">
+              <div className="lg:col-span-2 space-y-4 md:space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -651,7 +755,7 @@ export default function BouquetBuilderPage() {
                             <img
                               src={item.flower.image || "/placeholder.svg"}
                               alt={item.flower.name}
-                              className="w-6 h-6 rounded object-cover"
+                              className="w-6 h-6 md:w-12 md:h-12 rounded object-cover"
                             />
                             <span>
                               {item.flower.name} × {item.quantity}
@@ -673,62 +777,9 @@ export default function BouquetBuilderPage() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="preview" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>3D Превью букета</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="aspect-square bg-gradient-to-br from-green-50 to-pink-50 rounded-lg flex items-center justify-center border-2 border-dashed border-border">
-                  {selectedFlowers.length > 0 || selectedAdditionalItems.length > 0 ? (
-                    <div className="text-center space-y-4">
-                      <div className="relative">
-                        <div className="w-48 h-48 mx-auto bg-gradient-to-t from-green-200 to-transparent rounded-full flex items-end justify-center">
-                          <div className="grid grid-cols-3 gap-2 mb-8">
-                            {selectedFlowers.slice(0, 9).map((item, index) => (
-                              <div key={index} className="relative">
-                                <img
-                                  src={item.flower.image || "/placeholder.svg"}
-                                  alt={item.flower.name}
-                                  className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg"
-                                  style={{
-                                    transform: `rotate(${index * 15}deg) translateY(${index % 2 === 0 ? "-5px" : "5px"})`,
-                                  }}
-                                />
-                                {item.quantity > 1 && (
-                                  <Badge className="absolute -top-2 -right-2 w-5 h-5 rounded-full p-0 flex items-center justify-center text-xs">
-                                    {item.quantity}
-                                  </Badge>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <h3 className="font-bold text-lg">{bouquetName || "Новый букет"}</h3>
-                        <p className="text-muted-foreground">
-                          {selectedFlowers.reduce((sum, item) => sum + item.quantity, 0)} цветов
-                          {selectedAdditionalItems.length > 0 && (
-                            <span> + {selectedAdditionalItems.length} материалов</span>
-                          )}
-                        </p>
-                        <p className="font-bold text-xl">{Math.round(finalPrice)}₽</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center text-muted-foreground">
-                      <FlowerIcon className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                      <p>Добавьте цветы для просмотра 3D превью</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
           <TabsContent value="calculator" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Настройки цены */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -737,79 +788,142 @@ export default function BouquetBuilderPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  {/* Слайдер наценки */}
                   <div>
-                    <Label>Наценка: {markup[0]}%</Label>
-                    <Slider value={markup} onValueChange={setMarkup} max={200} min={10} step={5} className="mt-2" />
+                    <Label htmlFor="markup-slider" className="text-sm font-medium">
+                      Наценка: {markup[0]}%
+                    </Label>
+                    <Slider
+                      id="markup-slider"
+                      min={0}
+                      max={200}
+                      step={5}
+                      value={markup}
+                      onValueChange={setMarkup}
+                      className="mt-3"
+                    />
                   </div>
 
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span>Себестоимость цветов:</span>
-                      <span>{totalCost}₽</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Стоимость материалов:</span>
-                      <span>{additionalCost}₽</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Работа флориста (20%):</span>
-                      <span>{Math.round((totalCost + additionalCost) * 0.2)}₽</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Наценка ({markup[0]}%):</span>
-                      <span>
-                        {Math.round(
-                          ((totalCost + additionalCost + (totalCost + additionalCost) * 0.2) * markup[0]) / 100,
+                  {/* Поля для ввода стоимости */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="flower-cost" className="text-sm">
+                        Себестоимость цветов:
+                      </Label>
+                      <div className="flex items-center gap-2">
+                        {totalCost > 0 ? (
+                          <span className="w-20 h-8 text-right text-sm flex items-center justify-end font-medium text-green-600">
+                            {totalCost}
+                          </span>
+                        ) : (
+                          <Input
+                            id="flower-cost"
+                            type="number"
+                            value={manualFlowerCost}
+                            onChange={(e) => setManualFlowerCost(Number(e.target.value) || 0)}
+                            className="w-20 h-8 text-right text-sm"
+                            placeholder="200"
+                          />
                         )}
-                        ₽
-                      </span>
+                        <span className="text-sm text-muted-foreground">₽</span>
+                      </div>
                     </div>
-                    <div className="border-t pt-2">
-                      <div className="flex justify-between font-bold">
-                        <span>Итоговая цена:</span>
-                        <span>
-                          {Math.round(
-                            (totalCost + additionalCost + (totalCost + additionalCost) * 0.2) * (1 + markup[0] / 100),
-                          )}
-                          ₽
+
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="material-cost" className="text-sm">
+                        Стоимость материалов:
+                      </Label>
+                      <div className="flex items-center gap-2">
+                        {additionalCost > 0 ? (
+                          <span className="w-20 h-8 text-right text-sm flex items-center justify-end font-medium text-green-600">
+                            {additionalCost}
+                          </span>
+                        ) : (
+                          <Input
+                            id="material-cost"
+                            type="number"
+                            value={materialCost}
+                            onChange={(e) => setMaterialCost(Number(e.target.value) || 0)}
+                            className="w-20 h-8 text-right text-sm"
+                            placeholder="0"
+                          />
+                        )}
+                        <span className="text-sm text-muted-foreground">₽</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm">Работа флориста (20%):</Label>
+                      <div className="flex items-center gap-2">
+                        <span className="w-20 h-8 text-right text-sm flex items-center justify-end font-medium">
+                          {floristWork}
                         </span>
+                        <span className="text-sm text-muted-foreground">₽</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm">Наценка ({markup[0]}%):</Label>
+                      <div className="flex items-center gap-2">
+                        <span className="w-20 h-8 text-right text-sm flex items-center justify-end font-medium">
+                          {Math.round(markupAmount)}
+                        </span>
+                        <span className="text-sm text-muted-foreground">₽</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Итоговая цена */}
+                  <div className="pt-4 border-t">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-lg font-bold">Итоговая цена:</Label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg font-bold">{Math.round(finalCalculatedPrice)}</span>
+                        <span className="text-sm text-muted-foreground">₽</span>
                       </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
+              {/* Анализ прибыльности */}
               <Card>
                 <CardHeader>
                   <CardTitle>Анализ прибыльности</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
+                  {/* Показатели маржи и прибыли */}
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 border rounded-lg">
-                      <p className="text-2xl font-bold text-green-600">
-                        {Math.round(((finalPrice - (totalCost + additionalCost)) / finalPrice) * 100)}%
-                      </p>
-                      <p className="text-sm text-muted-foreground">Маржа</p>
+                    <div className="text-center p-4 border rounded-lg">
+                      <div className="text-2xl font-bold text-green-600">
+                        {totalBaseCost === 0 ? "NaN" : Math.round(margin)}%
+                      </div>
+                      <div className="text-sm text-muted-foreground">Маржа</div>
                     </div>
-                    <div className="text-center p-3 border rounded-lg">
-                      <p className="text-2xl font-bold text-blue-600">
-                        {Math.round(finalPrice - (totalCost + additionalCost))}₽
-                      </p>
-                      <p className="text-sm text-muted-foreground">Прибыль</p>
+                    <div className="text-center p-4 border rounded-lg">
+                      <div className="text-2xl font-bold text-blue-600">{Math.round(profit)}₽</div>
+                      <div className="text-sm text-muted-foreground">Прибыль</div>
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Конкурентная цена:</span>
-                      <span className="text-orange-600">от {Math.round((totalCost + additionalCost) * 1.3)}₽</span>
+                  {/* Поля для конкурентной цены */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm">Конкурентная цена:</Label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-orange-600">от {competitivePrice}₽</span>
+                      </div>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Премиум сегмент:</span>
-                      <span className="text-purple-600">от {Math.round((totalCost + additionalCost) * 2)}₽</span>
+
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm">Премиум сегмент:</Label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-purple-600">от {premiumPrice}₽</span>
+                      </div>
                     </div>
                   </div>
 
+                  {/* Кнопка экспорта */}
                   <Button className="w-full bg-transparent" variant="outline">
                     <Download className="h-4 w-4 mr-2" />
                     Экспорт калькуляции

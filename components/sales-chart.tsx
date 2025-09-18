@@ -16,15 +16,26 @@ const data = [
 export function SalesChart() {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Динамика продаж</CardTitle>
+      <CardHeader className="px-3 sm:px-6 pt-3 sm:pt-6">
+        <CardTitle className="text-base sm:text-lg">Динамика продаж</CardTitle>
       </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
+      <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+        <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis dataKey="name" className="text-muted-foreground" fontSize={12} />
-            <YAxis className="text-muted-foreground" fontSize={12} tickFormatter={(value) => `₽${value / 1000}k`} />
+            <XAxis
+              dataKey="name"
+              className="text-muted-foreground"
+              fontSize={10}
+              tick={{ fontSize: 10 }}
+              interval={0}
+            />
+            <YAxis
+              className="text-muted-foreground"
+              fontSize={10}
+              tick={{ fontSize: 10 }}
+              tickFormatter={(value) => `₽${value / 1000}k`}
+            />
             <Tooltip
               formatter={(value) => [`₽${value.toLocaleString()}`, "Продажи"]}
               labelStyle={{ color: "hsl(var(--foreground))" }}
@@ -32,14 +43,16 @@ export function SalesChart() {
                 backgroundColor: "hsl(var(--card))",
                 border: "1px solid hsl(var(--border))",
                 borderRadius: "8px",
+                fontSize: "12px",
               }}
             />
             <Line
               type="monotone"
               dataKey="sales"
               stroke="hsl(var(--primary))"
-              strokeWidth={3}
-              dot={{ fill: "hsl(var(--primary))", strokeWidth: 2, r: 4 }}
+              strokeWidth={2}
+              dot={{ fill: "hsl(var(--primary))", strokeWidth: 2, r: 3 }}
+              className="sm:stroke-[3px] sm:[&>circle]:r-4"
             />
           </LineChart>
         </ResponsiveContainer>
